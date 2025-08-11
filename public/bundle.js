@@ -106,6 +106,8 @@ class PasswordApp {
         this.passwordManager = new PasswordManager();
         this.currentView = 'dashboard';
         this.editingPasswordId = null;
+        this.sortColumn = null;
+        this.sortDirection = 'asc';
         this.init();
     }
 
@@ -113,8 +115,12 @@ class PasswordApp {
         this.setupNavigation();
         this.setupModal();
         this.setupForm();
+        this.setupRouting();
         this.updateDashboard();
         this.renderPasswordsTable();
+        
+        // Handle initial route
+        this.handleRoute();
     }
 
     setupNavigation() {
@@ -124,14 +130,14 @@ class PasswordApp {
         if (dashboardNav) {
             dashboardNav.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.showView('dashboard');
+                this.navigateTo('dashboard');
             });
         }
 
         if (passwordsNav) {
             passwordsNav.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.showView('passwords');
+                this.navigateTo('passwords');
             });
         }
     }
@@ -156,6 +162,38 @@ class PasswordApp {
         } else if (viewName === 'passwords') {
             this.renderPasswordsTable();
         }
+    }
+
+    setupRouting() {
+        window.addEventListener('popstate', (e) => {
+            this.handleRoute();
+        });
+    }
+
+    navigateTo(route) {
+        const url = route === 'dashboard' ? '/' : `/${route}`;
+        window.history.pushState({ route }, '', url);
+        this.showView(route);
+    }
+
+    handleRoute() {
+        const path = window.location.pathname;
+        let route;
+        
+        if (path === '/' || path === '/index.html') {
+            route = 'dashboard';
+        } else if (path === '/dashboard') {
+            route = 'dashboard';
+        } else if (path === '/passwords') {
+            route = 'passwords';
+        } else {
+            // Default to dashboard for unknown routes
+            route = 'dashboard';
+            // Update URL without triggering navigation
+            window.history.replaceState({ route: 'dashboard' }, '', '/');
+        }
+        
+        this.showView(route);
     }
 
     updateDashboard() {
@@ -190,9 +228,14 @@ class PasswordApp {
                 <td>${this.escapeHtml(password.url)}</td>
                 <td>${this.escapeHtml(password.username)}</td>
                 <td>
-                    <span class="password-display">
-                        ${'•'.repeat(password.password.length)}
-                    </span>
+                    <div class="password-field">
+                        <span class="password-display" data-password="${this.escapeHtml(password.password)}" data-hidden="true">
+                            ${'•'.repeat(password.password.length)}
+                        </span>
+                        <button class="toggle-password-btn" onclick="window.app.togglePassword(this)" title="Show/Hide Password">
+                            👁️
+                        </button>
+                    </div>
                 </td>
                 <td>
                     <button class="btn-edit" onclick="window.app.editPassword('${password.id}')">
@@ -317,6 +360,112 @@ class PasswordApp {
             this.updateDashboard();
             this.renderPasswordsTable();
         }
+    }
+
+    togglePassword(button) {
+        const passwordSpan = button.previousElementSibling;
+        const isHidden = passwordSpan.getAttribute('data-hidden') === 'true';
+        const actualPassword = passwordSpan.getAttribute('data-password');
+        
+        if (isHidden) {
+            passwordSpan.textContent = actualPassword;
+            passwordSpan.setAttribute('data-hidden', 'false');
+            button.textContent = '🙈';
+            button.title = 'Hide Password';
+        } else {
+            passwordSpan.textContent = '•'.repeat(actualPassword.length);
+            passwordSpan.setAttribute('data-hidden', 'true');
+            button.textContent = '👁️';
+            button.title = 'Show Password';
+        }
+    }
+
+    sortTable(column) {
+        const passwords = this.passwordManager.getAllPasswords();
+        
+        // Toggle sort direction if same column, otherwise set to ascending
+        if (this.sortColumn === column) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortColumn = column;
+            this.sortDirection = 'asc';
+        }
+
+        // Sort passwords based on column and direction
+        passwords.sort((a, b) => {
+            let aValue = a[column].toLowerCase();
+            let bValue = b[column].toLowerCase();
+            
+            if (this.sortDirection === 'asc') {
+                return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+            } else {
+                return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+            }
+        });
+
+        // Update the visual indicators
+        this.updateSortIndicators();
+        
+        // Re-render table with sorted data
+        this.renderSortedTable(passwords);
+    }
+
+    updateSortIndicators() {
+        const indicators = document.querySelectorAll('.sort-indicator');
+        indicators.forEach(indicator => {
+            indicator.classList.remove('asc', 'desc');
+        });
+
+        if (this.sortColumn) {
+            const activeHeader = document.querySelector(`th[onclick="window.app.sortTable('${this.sortColumn}')"] .sort-indicator`);
+            if (activeHeader) {
+                activeHeader.classList.add(this.sortDirection);
+            }
+        }
+    }
+
+    renderSortedTable(sortedPasswords) {
+        const tbody = document.getElementById('passwords-tbody');
+        if (!tbody) return;
+
+        if (sortedPasswords.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        <div>
+                            <h3>No passwords saved yet</h3>
+                            <p>Click "Add New Password" to get started</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = sortedPasswords.map(password => `
+            <tr>
+                <td>${this.escapeHtml(password.url)}</td>
+                <td>${this.escapeHtml(password.username)}</td>
+                <td>
+                    <div class="password-field">
+                        <span class="password-display" data-password="${this.escapeHtml(password.password)}" data-hidden="true">
+                            ${'•'.repeat(password.password.length)}
+                        </span>
+                        <button class="toggle-password-btn" onclick="window.app.togglePassword(this)" title="Show Password">
+                            👁️
+                        </button>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn-edit" onclick="window.app.editPassword('${password.id}')">
+                        Edit
+                    </button>
+                    <button class="btn-danger" onclick="window.app.deletePassword('${password.id}')">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
     }
 
     escapeHtml(text) {

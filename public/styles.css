@@ -216,6 +216,56 @@ tbody tr:hover {
     background-color: #f8f9fa;
 }
 
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.sortable:hover {
+    background-color: #e9ecef;
+}
+
+.sort-indicator {
+    margin-left: 0.5rem;
+    opacity: 0.5;
+}
+
+.sort-indicator::after {
+    content: '↕️';
+}
+
+.sort-indicator.asc::after {
+    content: '↑';
+    opacity: 1;
+}
+
+.sort-indicator.desc::after {
+    content: '↓';
+    opacity: 1;
+}
+
+.password-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toggle-password-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-password-btn:hover {
+    background-color: #f8f9fa;
+}
+
 .modal {
     display: none;
     position: fixed;

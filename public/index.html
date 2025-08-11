@@ -51,9 +51,15 @@
                     <table id="passwords-table">
                         <thead>
                             <tr>
-                                <th>URL</th>
-                                <th>Username</th>
-                                <th>Password</th>
+                                <th class="sortable" onclick="window.app.sortTable('url')">
+                                    URL <span class="sort-indicator"></span>
+                                </th>
+                                <th class="sortable" onclick="window.app.sortTable('username')">
+                                    Username <span class="sort-indicator"></span>
+                                </th>
+                                <th class="sortable" onclick="window.app.sortTable('password')">
+                                    Password <span class="sort-indicator"></span>
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
