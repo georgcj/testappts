@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <h2>Password Manager</h2>
+            <nav>
+                <ul>
+                    <li><a href="#" id="dashboard-nav" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#" id="passwords-nav" class="nav-link">Manage Passwords</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <h1>Dashboard</h1>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">🔐</div>
+                        <div class="stat-content">
+                            <h3>Total Passwords</h3>
+                            <span id="password-count" class="stat-number">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3>Security Score</h3>
+                            <span class="stat-number">Good</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Passwords Management View -->
+            <div id="passwords-view" class="view">
+                <div class="view-header">
+                    <h1>Manage Passwords</h1>
+                    <button id="add-password-btn" class="btn-primary">Add New Password</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="passwords-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="passwords-tbody">
+                            <!-- Passwords will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Password Modal -->
+    <div id="password-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Add New Password</h2>
+            <form id="password-form">
+                <div class="form-group">
+                    <label for="url-input">URL:</label>
+                    <input type="url" id="url-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="username-input">Username:</label>
+                    <input type="text" id="username-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="password-input">Password:</label>
+                    <input type="password" id="password-input" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="bundle.js"></script>
+</body>
+</html>
