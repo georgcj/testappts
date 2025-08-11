@@ -1,7 +1,8 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '..', '..', '..', '.env') });
 
 export interface DatabaseConfig {
   host: string;
@@ -33,8 +34,6 @@ class Database {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-      acquireTimeout: 60000,
-      timeout: 60000,
     });
   }
 

@@ -111,7 +111,6 @@ export class PasswordEntry {
         created_at: row.created_at,
         updated_at: row.updated_at,
         last_accessed: row.last_accessed,
-        has_notes: !!row.notes
       }));
     }
 
@@ -193,7 +192,6 @@ export class PasswordEntry {
         created_at: row.created_at,
         updated_at: row.updated_at,
         last_accessed: row.last_accessed,
-        has_notes: !!row.notes
       };
     }
 
